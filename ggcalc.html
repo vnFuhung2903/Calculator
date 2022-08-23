@@ -22,34 +22,34 @@
         <button class = "func" onclick="addExpression('(')"> ( </button>
         <button class = "func" onclick="addExpression(')')"> ) </button>
         <button class = "func" onclick="addExpression('%')"> % </button>
-        <button class = "func" id = "Del" onclick="Delete()"> CE </button>
-        <button class = "func" onclick="changeButton()"> Inv </button>
-        <button class = "func" onclick="addExpression('sin')"> sin </button>
-        <button class = "func" onclick="addExpression('ln')"> ln </button>
+        <button class = "func" id = 'Del' onclick="Delete()"> CE </button>
+        <button class = "func" id = 'lnv' onclick="changeButton()"> lnv </button>
+        <button class = "func" id = 'sin' onclick="addExpression('sin')"> sin </button>
+        <button class = "func" id = 'ln' onclick="addExpression('ln')"> ln </button>
         <button class = "number" onclick="addExpression('7')"> 7 </button>
         <button class = "number" onclick="addExpression('8')"> 8 </button>
         <button class = "number" onclick="addExpression('9')"> 9 </button>
         <button class = "func" onclick="addExpression('/')"> / </button>
         <button class = "func" onclick="addExpression('π')"> π </button>
-        <button class = "func" onclick="addExpression('cos')"> cos </button>
-        <button class = "func" onclick="addExpression('log')"> log </button>
+        <button class = "func" id = 'cos' onclick="addExpression('cos')"> cos </button>
+        <button class = "func" id = 'log' onclick="addExpression('log')"> log </button>
         <button class = "number" onclick="addExpression('4')"> 4 </button>
         <button class = "number" onclick="addExpression('5')"> 5 </button>
         <button class = "number" onclick="addExpression('6')"> 6 </button>
         <button class = "func" onclick="addExpression('*')"> * </button>
         <button class = "func" onclick="addExpression('e')"> e </button>
-        <button class = "func" onclick="addExpression('tan')"> tan </button>
-        <button class = "func" onclick="addExpression('√')"> √ </button>
+        <button class = "func" id = 'tan' onclick="addExpression('tan')"> tan </button>
+        <button class = "func" id = 'sqr' onclick="addExpression('√')"> √ </button>
         <button class = "number" onclick="addExpression('1')"> 1 </button>
         <button class = "number" onclick="addExpression('2')"> 2 </button>
         <button class = "number" onclick="addExpression('3')"> 3 </button>
         <button class = "func" onclick="addExpression('-')"> - </button>
-        <button class = "func" onclick="addExpression('Ans')"> Ans </button>
+        <button class = "func" id = 'Ans' onclick="addExpression('Ans')"> Ans </button>
         <button class = "func" onclick="addExpression('E')"> EXP </button>
-        <button class = "func" onclick="addExpression('^')"> ^ </button>
+        <button class = "func" id = 'power' onclick="addExpression('^')"> ^ </button>
         <button class = "number" onclick="addExpression('0')"> 0 </button>
         <button class = "number" onclick="addExpression('.')"> . </button>
-        <button class = "func" id = "equal" onclick="Equal()"> = </button>
+        <button class = "func" id = 'equal' onclick="Equal()"> = </button>
         <button class = "func" onclick="addExpression('+')"> + </button>
     </div>
 
@@ -69,8 +69,27 @@
             document.getElementById('Degree').style.color = "black";
         }
         function changeButton(){
-            isChange = 1 - isChange
-            
+            isChange = 1 - isChange;
+            if(isChange == 1){
+                document.getElementById('Ans').innerHTML = 'Rnd';
+                document.getElementById('sin').innerHTML = 'asin';
+                document.getElementById('cos').innerHTML = 'acos';
+                document.getElementById('tan').innerHTML = 'atan';
+                document.getElementById('ln').innerHTML = 'e^x';
+                document.getElementById('log').innerHTML = '10^x';
+                document.getElementById('sqr').innerHTML = 'x^2';
+                document.getElementById('lnv').style.backgroundColor = "white";
+            }
+            if(isChange == 0){
+                document.getElementById('Ans').innerHTML = 'Ans';
+                document.getElementById('sin').innerHTML = 'sin';
+                document.getElementById('cos').innerHTML = 'cos';
+                document.getElementById('tan').innerHTML = 'tan';
+                document.getElementById('ln').innerHTML = 'ln';
+                document.getElementById('log').innerHTML = 'log';
+                document.getElementById('sqr').innerHTML = '√';
+                document.getElementById('lnv').style.backgroundColor = "lightgray";
+            }
         }
 
         function addExpression(x) {
