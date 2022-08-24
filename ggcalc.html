@@ -22,7 +22,7 @@
         <button class = "func" onclick="addExpression('(')"> ( </button>
         <button class = "func" onclick="addExpression(')')"> ) </button>
         <button class = "func" onclick="addExpression('%')"> % </button>
-        <button class = "func" id = 'Del' onclick="Delete()"> CE </button>
+        <button class = "func" id = 'Del' onclick="Delete()"> AC </button>
         <button class = "func" id = 'lnv' onclick="changeButton()"> lnv </button>
         <button class = "func" id = 'sin' onclick="addExpression('sin')"> sin </button>
         <button class = "func" id = 'ln' onclick="addExpression('ln')"> ln </button>
@@ -54,18 +54,18 @@
     </div>
 
     <script>
-        var expression = [], stringex = "";
+        var expression = [], stringOnscreen = "";
         let previousAns = 0, currentAns = 0;
         let isRad = 0, isAC = 0, isChange = 0;
 
         function changedeg() {
             isRad = 0;
-            document.getElementById('Degree').style.color = "red";
+            document.getElementById('Degree').style.color = "ghostwhite";
             document.getElementById('Radian').style.color = "black";
         }
         function changerad() {
             isRad = 1;
-            document.getElementById('Radian').style.color = "red";
+            document.getElementById('Radian').style.color = "ghostwhite";
             document.getElementById('Degree').style.color = "black";
         }
         function changeButton(){
@@ -78,7 +78,8 @@
                 document.getElementById('ln').innerHTML = 'e^x';
                 document.getElementById('log').innerHTML = '10^x';
                 document.getElementById('sqr').innerHTML = 'x^2';
-                document.getElementById('lnv').style.backgroundColor = "white";
+                document.getElementById('power').innerHTML = 'x^(1/y)';
+                document.getElementById('lnv').style.backgroundColor = "ghostwhite";
             }
             if(isChange == 0){
                 document.getElementById('Ans').innerHTML = 'Ans';
@@ -88,6 +89,7 @@
                 document.getElementById('ln').innerHTML = 'ln';
                 document.getElementById('log').innerHTML = 'log';
                 document.getElementById('sqr').innerHTML = '√';
+                document.getElementById('power').innerHTML = '^';
                 document.getElementById('lnv').style.backgroundColor = "lightgray";
             }
         }
@@ -99,28 +101,97 @@
             }
 
             if(precedence(x) == 1) {
-                if(stringex.length > 0 && precedence(stringex[stringex.length - 1]) == 1) return;
-                if(stringex.length == 0 || !DigitChecking(stringex[stringex.length - 1])){
+                if(stringOnscreen.length > 0 && precedence(stringOnscreen[stringOnscreen.length - 1]) == 1) return;
+                if(stringOnscreen.length == 0 || (stringOnscreen[stringOnscreen.length - 1] != ')' && !DigitChecking(stringOnscreen[stringOnscreen.length - 1]))){
                     if(x == '+')    x = '0+';
                     else            x = '0-';
                 }
             }
-            if(precedence(x) == 2 && stringex.length > 0 && precedence(stringex[stringex.length - 1]) == 2) return;
-            if(x == '!' && precedence(stringex[stringex.length - 1]) > 0) return;
-            if(x == 'Ans')      expression.push(previousAns);
-            else if(x == 'π')   expression.push(Math.PI);
-            else if(x == 'e')   expression.push(Math.E);
-            else                expression.push(x);
 
-            if(x == '0+')   stringex = stringex + '+';
-            else if(x == '0-') stringex = stringex + '-';
-            else stringex = stringex + x;
-            if(x == 'sin' || x == 'cos' || x == 'tan' || x == 'log' || x == 'ln' || x == '√'){
-                stringex = stringex + '(';
+            if(precedence(x) == 2 && stringOnscreen.length > 0 && precedence(stringOnscreen[stringOnscreen.length - 1]) == 2) return;
+            if(x == '!' && precedence(stringOnscreen[stringOnscreen.length - 1]) > 0) return;
+
+            if(isChange == 1){
+                if(x == 'sin')  x = 'asin';
+                if(x == 'cos')  x = 'acos';
+                if(x == 'tan')  x = 'atan';
+                if(x == 'Ans')  x = 'Rnd';
+                if(x == 'ln')   x = 'e^';
+                if(x == 'log')  x = '10^';
+                if(x == '√')    x = '^2';
+                if(x == '^')    x = '^(1/';
+            }
+            if((precedence(x) == 4 || x == 'Rnd' || x == 'Ans' || DigitChecking(x) || x == '(') && stringOnscreen.length > 0 && stringOnscreen[stringOnscreen.length - 1] == ')'){
+                if(DigitChecking(x) || x == 'Rnd') stringOnscreen = stringOnscreen + "*";
+                expression.push("*");
+            }
+            if(stringOnscreen.length > 0 && (DigitChecking(stringOnscreen[stringOnscreen.length - 1]) || stringOnscreen[stringOnscreen.length - 1] == 'e' || stringOnscreen[stringOnscreen.length - 1] == 'π') && (x == '(' || x == 'e^' || x == '10^' || x == 'Rnd' || x == 'Ans' || precedence(x) == 4)){
+                if(DigitChecking(stringOnscreen[stringOnscreen.length - 1])) stringOnscreen = stringOnscreen + "*";
+                expression.push("*");
+            }
+
+            if(stringOnscreen.length >= 3 && stringOnscreen.substr(stringOnscreen.length - 3, stringOnscreen.length) == 'Ans' && (DigitChecking(x) || x == 'Rnd' || x == 'Ans' || x == '(' || x == 'e^' || x == '10^' || precedence(x) == 4))
+
+            if(x == 'Rnd'){
+                let randomNumber = Math.random();
+                stringOnscreen = stringOnscreen + randomNumber;
+                expression.push(randomNumber);
+            }
+
+            switch(x){
+                case 'Ans':
+                    expression.push(previousAns);
+                    break;
+                case 'π':
+                    expression.push(Math.PI);
+                    break;
+                case 'e':
+                    expression.push(Math.E);
+                    break;
+                case 'e^':
+                    expression.push(Math.E);
+                    expression.push("^");
+                    break;
+                case '10^':
+                    expression.push("1");
+                    expression.push("0");
+                    expression.push("^");
+                    break;
+                case '^2':
+                    expression.push("^");
+                    expression.push("2");
+                    break;
+                case '^(1/':
+                    expression.push("^");
+                    expression.push("(");
+                    expression.push(1);
+                    expression.push("/");
+                    break;
+                case 'Rnd':
+                    break;
+                default: 
+                    expression.push(x);
+            }
+
+            switch(x){
+                case '0+':
+                    stringOnscreen = stringOnscreen + "+";
+                    break;
+                case '0-':
+                    stringOnscreen = stringOnscreen + "-";
+                    break;
+                case 'Rnd':
+                    break;
+                default: 
+                    stringOnscreen = stringOnscreen + x;
+            }
+
+            if(x == 'sin' || x == 'cos' || x == 'tan' || x == 'log' || x == 'ln' || x == 'asin' || x == 'acos' || x == 'atan'){
+                stringOnscreen = stringOnscreen + '(';
                 expression.push('(');
             }
             document.getElementById('PreAns').innerHTML = "Ans =" + previousAns;
-            document.getElementById('Answer').innerHTML = stringex;
+            document.getElementById('Answer').innerHTML = stringOnscreen;
         }
 
         function Delete(){
@@ -131,10 +202,11 @@
                 isAC = 0;
                 return;
             }
-            let strsize = stringex.length; 
+            let strsize = stringOnscreen.length; 
             let num = expression.pop().length;
-            stringex = stringex.substr(0, strsize - num);
-            document.getElementById('Answer').innerHTML = stringex;
+            stringOnscreen = stringOnscreen.substr(0, strsize - num);
+            if(stringOnscreen.length > 0) document.getElementById('Answer').innerHTML = stringOnscreen;
+            else                    document.getElementById('Answer').innerHTML = "0";
         }
 
         function DigitChecking(id) {
@@ -150,7 +222,7 @@
             }
             for(i = 1; i <= numBracket; ++i){
                 expression.push(')');
-                stringex = stringex + ')';
+                stringOnscreen = stringOnscreen + ')';
             }
         }
 
@@ -186,7 +258,7 @@
         }
 
         function precedence(ope) {
-            if(ope == '√' || ope.length > 1 || ope == '0+' || ope == '0-') return 4;
+            if(ope == '√' || ope == 'sin' || ope == 'cos' || ope == 'tan' || ope == 'asin' || ope == 'acos' || ope == 'atan' || ope == '0+' || ope == '0-') return 4;
             if(ope == '^' || ope == '%' || ope == 'E' || ope == '!')    return 3;
             if(ope == '*' || ope == '/')    return 2;
             if(ope == '+' || ope == '-')    return 1;
@@ -234,21 +306,34 @@
         }
 
         function roundeps(x) {
-            if(-1e-11 <= x && x <= 1e-11)   return 0;
+            if(-1e-11 <= Math.abs(x - Math.round(x)) && Math.abs(x - Math.round(x)) <= 1e-11)
+                return Math.round(x);
             return x;
         }
 
         function Result1(x, ope) {
-            if(ope == '0+') return x;
-            if(ope == '0-') return -x;
+            if(ope == "0+") return x;
+            if(ope == "0-") return -x;
             if(ope == "%")  return x / 100;
             if(ope == "sin") return roundeps(Math.sin((1 - isRad) * x * Math.PI / 180 + isRad * x));
             if(ope == "cos") return roundeps(Math.cos((1 - isRad) * x * Math.PI / 180 + isRad * x));
             if(ope == "tan") return roundeps(roundeps(Math.sin((1 - isRad) * x * Math.PI / 180 + isRad * x)) / roundeps(Math.cos((1 - isRad) * x * Math.PI / 180 + isRad * x)));
+            if(ope == "asin"){
+                if(isRad == 1)  return roundeps(Math.asin(x)); 
+                else            return roundeps(Math.asin(x) / Math.PI * 180);
+            }
+            if(ope == "acos"){
+                if(isRad == 1)  return roundeps(Math.acos(x)); 
+                else            return roundeps(Math.acos(x) / Math.PI * 180);
+            }
+            if(ope == "atan"){
+                if(isRad == 1)  return roundeps(Math.atan(x)); 
+                else            return roundeps(Math.atan(x) / Math.PI * 180);
+            }
             if(ope == "log") return Math.log10(x);
             if(ope == "ln") return Math.log(x);
             if(ope == "√") return Math.sqrt(x);
-            if(ope == '!') return Factorial(x);
+            if(ope == "!") return Factorial(x);
         }
 
         function Factorial(x) {
@@ -289,14 +374,14 @@
         }
 
         function Equal() {
-            if(stringex == "") return;
+            if(stringOnscreen == "") return;
             CheckArray(expression);
-            document.getElementById('PreAns').innerHTML = stringex + "=";
+            document.getElementById('PreAns').innerHTML = stringOnscreen + "=";
             fixArray(expression);
             document.getElementById('Answer').innerHTML = (!isNaN(currentAns) ? currentAns : "Error");
             previousAns = currentAns;
             expression = [];
-            stringex = "";
+            stringOnscreen = "";
             document.getElementById('Del').innerHTML = "AC";
             isAC = 1;
         }
