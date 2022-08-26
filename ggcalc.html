@@ -54,9 +54,9 @@
     </div>
 
     <script>
-        var expression = [], stringOnscreen = "";
+        var expression = [0], stringOnscreen = "";
         let previousAns = 0, currentAns = 0;
-        let isRad = 0, isAC = 0, isChange = 0;
+        let isRad = 0, isAC = 0, isChange = 0, haveDot = 0, numBracket = 0;
 
         function changedeg() {
             isRad = 0;
@@ -100,16 +100,36 @@
                 isAC = 0;
             }
 
+            if(stringOnscreen == ""){
+                expression = [];
+                if(precedence(x) == 2 || x == 'E' || x == '!' || x == '%' || x == '.'){
+                    stringOnscreen = stringOnscreen + "0";
+                    expression.push("0");
+                }
+            }
+            else {
+                if(precedence(x) == 2 && precedence(stringOnscreen[stringOnscreen.length - 1]) == 2) return;
+                if((x == '!' || x == '%' || x == 'E' || x == '.') && !DigitChecking(stringOnscreen[stringOnscreen.length - 1]))
+                    return;
+            }
+
             if(precedence(x) == 1) {
-                if(stringOnscreen.length > 0 && precedence(stringOnscreen[stringOnscreen.length - 1]) == 1) return;
-                if(stringOnscreen.length == 0 || (stringOnscreen[stringOnscreen.length - 1] != ')' && !DigitChecking(stringOnscreen[stringOnscreen.length - 1]))){
+                if(stringOnscreen.length > 0 && precedence(stringOnscreen[stringOnscreen.length - 1]) > 0 && precedence(stringOnscreen[stringOnscreen.length - 1]) <= 2) 
+                    return;
+                if(stringOnscreen.length == 0 || (stringOnscreen[stringOnscreen.length - 1] != ')' && stringOnscreen[stringOnscreen.length - 1] != 's' && !DigitChecking(stringOnscreen[stringOnscreen.length - 1]))){
                     if(x == '+')    x = '0+';
                     else            x = '0-';
                 }
             }
+            if(x == '.'){
+                if(haveDot) return;
+                haveDot = 1;
+            }
 
-            if(precedence(x) == 2 && stringOnscreen.length > 0 && precedence(stringOnscreen[stringOnscreen.length - 1]) == 2) return;
-            if(x == '!' && precedence(stringOnscreen[stringOnscreen.length - 1]) > 0) return;
+            if(x == ')'){
+                if(numBracket == 0) return;
+                --numBracket;
+            }
 
             if(isChange == 1){
                 if(x == 'sin')  x = 'asin';
@@ -121,16 +141,28 @@
                 if(x == '√')    x = '^2';
                 if(x == '^')    x = '^(1/';
             }
-            if((precedence(x) == 4 || x == 'Rnd' || x == 'Ans' || DigitChecking(x) || x == '(') && stringOnscreen.length > 0 && stringOnscreen[stringOnscreen.length - 1] == ')'){
-                if(DigitChecking(x) || x == 'Rnd') stringOnscreen = stringOnscreen + "*";
-                expression.push("*");
-            }
-            if(stringOnscreen.length > 0 && (DigitChecking(stringOnscreen[stringOnscreen.length - 1]) || stringOnscreen[stringOnscreen.length - 1] == 'e' || stringOnscreen[stringOnscreen.length - 1] == 'π') && (x == '(' || x == 'e^' || x == '10^' || x == 'Rnd' || x == 'Ans' || precedence(x) == 4)){
-                if(DigitChecking(stringOnscreen[stringOnscreen.length - 1])) stringOnscreen = stringOnscreen + "*";
-                expression.push("*");
-            }
 
-            if(stringOnscreen.length >= 3 && stringOnscreen.substr(stringOnscreen.length - 3, stringOnscreen.length) == 'Ans' && (DigitChecking(x) || x == 'Rnd' || x == 'Ans' || x == '(' || x == 'e^' || x == '10^' || precedence(x) == 4))
+            if(haveDot && !DigitChecking(x)) haveDot = 0;
+
+            let special = 0;
+            if(x == '(' || x == 'e' || x == 'e^' || x == '10^' || x == 'π' || x == 'Rnd' || x == 'Ans' || precedence(x) == 4)   special = 1;
+
+            if(stringOnscreen.length > 0){
+                if(stringOnscreen[stringOnscreen.length - 1] == ')' && special == 1){
+                    if(DigitChecking(x) || x == 'Rnd') stringOnscreen = stringOnscreen + "*";
+                    expression.push("*");
+                }
+                if((stringOnscreen[stringOnscreen.length - 1] == 's' || stringOnscreen[stringOnscreen.length - 1] == 'e' || stringOnscreen[stringOnscreen.length - 1] == 'π') && special == 1){
+                    stringOnscreen = stringOnscreen + "*";
+                    expression.push("*");
+                }
+                if(DigitChecking(stringOnscreen[stringOnscreen.length - 1]) && special == 1){
+                    expression.push("*");
+                }
+                if((stringOnscreen[stringOnscreen.length - 1] == 'E' || stringOnscreen[stringOnscreen.length - 1] == '.') && !DigitChecking(x)){
+                    expression.push("0");
+                }
+            }
 
             if(x == 'Rnd'){
                 let randomNumber = Math.random();
@@ -139,9 +171,6 @@
             }
 
             switch(x){
-                case 'Ans':
-                    expression.push(previousAns);
-                    break;
                 case 'π':
                     expression.push(Math.PI);
                     break;
@@ -186,12 +215,16 @@
                     stringOnscreen = stringOnscreen + x;
             }
 
-            if(x == 'sin' || x == 'cos' || x == 'tan' || x == 'log' || x == 'ln' || x == 'asin' || x == 'acos' || x == 'atan'){
+            if(x == 'sin' || x == 'cos' || x == 'tan' || x == 'log' || x == 'ln' || x == 'asin' || x == 'acos' || x == 'atan' || x == '√'){
                 stringOnscreen = stringOnscreen + '(';
                 expression.push('(');
             }
+            if(stringOnscreen[stringOnscreen.length - 1] == '(') ++numBracket;
             document.getElementById('PreAns').innerHTML = "Ans =" + previousAns;
             document.getElementById('Answer').innerHTML = stringOnscreen;
+            if(isChange == 1){
+                changeButton()
+            }
         }
 
         function Delete(){
@@ -205,8 +238,8 @@
             let strsize = stringOnscreen.length; 
             let num = expression.pop().length;
             stringOnscreen = stringOnscreen.substr(0, strsize - num);
-            if(stringOnscreen.length > 0) document.getElementById('Answer').innerHTML = stringOnscreen;
-            else                    document.getElementById('Answer').innerHTML = "0";
+            if(stringOnscreen == "")    document.getElementById('Answer').innerHTML = "0";
+            else                        document.getElementById('Answer').innerHTML = stringOnscreen;
         }
 
         function DigitChecking(id) {
@@ -215,14 +248,10 @@
         }
 
         function CheckArray(arr) {
-            let numBracket = 0;
-            for(let i = 0; i < arr.length; ++i){
-                if(arr[i] == '(')   ++numBracket;
-                if(arr[i] == ')')   --numBracket;
-            }
             for(i = 1; i <= numBracket; ++i){
                 expression.push(')');
                 stringOnscreen = stringOnscreen + ')';
+                --numBracket;
             }
         }
 
@@ -252,7 +281,8 @@
                     positive = 1;
                     continue;
                 }
-                a.push(arr[i]);
+                if(arr[i] == 'Ans') a.push(previousAns);
+                else                a.push(arr[i]);
             }
             Postfix(a);
         }
@@ -374,13 +404,12 @@
         }
 
         function Equal() {
-            if(stringOnscreen == "") return;
             CheckArray(expression);
-            document.getElementById('PreAns').innerHTML = stringOnscreen + "=";
+            if(stringOnscreen != "") document.getElementById('PreAns').innerHTML = stringOnscreen + "=";
             fixArray(expression);
             document.getElementById('Answer').innerHTML = (!isNaN(currentAns) ? currentAns : "Error");
-            previousAns = currentAns;
-            expression = [];
+            previousAns = (!isNaN(currentAns) ? currentAns : 0);
+            // expression = [];
             stringOnscreen = "";
             document.getElementById('Del').innerHTML = "AC";
             isAC = 1;
