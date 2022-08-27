@@ -62,13 +62,13 @@
 
         function changedeg() {
             isRad = 0;
-            document.getElementById('Degree').style.color = "ghostwhite";
-            document.getElementById('Radian').style.color = "black";
+            document.getElementById('Degree').style.color = "black";
+            document.getElementById('Radian').style.color = "ghostwhite";
         }
         function changerad() {
             isRad = 1;
-            document.getElementById('Radian').style.color = "ghostwhite";
-            document.getElementById('Degree').style.color = "black";
+            document.getElementById('Radian').style.color = "black";
+            document.getElementById('Degree').style.color = "ghostwhite";
         }
         function changeButton(){
             isChange = 1 - isChange;
@@ -107,9 +107,15 @@
 
             if(stringOnscreen == ""){
                 expression = [];
-                if(precedence(x) == 2 || x == 'E' || x == '!' || x == '%' || x == '.'){
-                    stringOnscreen = stringOnscreen + previousAns;
-                    expression.push(previousAns.toString());
+                if((precedence(x) > 0 && precedence(x) < 4) || x == 'E' || x == '!' || x == '%' || x == '.'){
+                    if(precedence(x) == 1 && previousAns == 0){
+                        if(x == '+')    x = '0+';
+                        else            x = '0-';
+                    }
+                    else{
+                        stringOnscreen = stringOnscreen + previousAns;
+                        expression.push(previousAns.toString());
+                    }
                 }
             }
             else {
@@ -200,6 +206,7 @@
                     expression.push("(");
                     expression.push("1");
                     expression.push("/");
+                    ++numBracket;
                     break;
                 case 'Rnd':
                     break;
@@ -220,7 +227,7 @@
                     stringOnscreen = stringOnscreen + x;
             }
 
-            if(x == 'sin' || x == 'cos' || x == 'tan' || x == 'log' || x == 'ln' || x == 'asin' || x == 'acos' || x == 'atan' || x == '√'){
+            if(x == 'sin' || x == 'cos' || x == 'tan' || x == 'log' || x == 'ln' || x == 'asin' || x == 'acos' || x == 'atan' || x == '√' || x == 'e^' || x == '10^' || x == '^'){
                 stringOnscreen = stringOnscreen + '(';
                 expression.push('(');
             }
@@ -238,6 +245,7 @@
                 document.getElementById('Answer').innerHTML = "0";
                 document.getElementById('Del').innerHTML = "CE";
                 isAC = 0;
+                previousAns = 0;
                 return;
             }
             let strsize = stringOnscreen.length;
@@ -264,8 +272,8 @@
             for(i = 1; i <= numBracket; ++i){
                 expression.push(')');
                 stringOnscreen = stringOnscreen + ')';
-                --numBracket;
             }
+            numBracket = 0;
         }
 
         function fixArray(arr) {
@@ -305,7 +313,7 @@
                     a.push(previousAns);
                     continue;
                 }
-                else                a.push(arr[i]);
+                a.push(arr[i]);
             }
             Postfix(a);
         }
