@@ -8,9 +8,22 @@
 	text-align: center;
 }
 
+#google-link link{
+	color: blue;
+}
+
+#google-link: visited {
+	color: red;
+}
+
+li: only-child {
+	color:  red;
+}
+
 .Calculator{
 	display: grid;
 	grid-template-columns: repeat(7, 100px);
+	/*grid-template-rows: repeat(5, 50px);*/
 }
 
 button{
@@ -25,7 +38,7 @@ button{
 	background-color: lightgrey;
 }
 
-#Degree{
+#Radian{
 	color: ghostwhite;
 }
 
@@ -35,18 +48,20 @@ button{
 }
 
 #Answer{
-	font-family: Times, sans-serif;
+	font-family: Roboto, sans-serif;
 	font-size: 80;
 	width: 700px;
 	text-align: right;
+	overflow: hidden;
 }
 
 #PreAns{
-	font-family: Times, sans-serif;
+	font-family: Roboto, sans-serif;
 	font-size: 80;
 	width: 700px;
 	text-align: right;
 	color: gray;
+	overflow: hidden;
 }
 
 #equal:hover{
