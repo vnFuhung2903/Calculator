@@ -102,6 +102,9 @@
                 isAC = 0;
             }
 
+            let special = 0;
+            if(x == '(' || x == 'e' || x == 'e^' || x == '10^' || x == 'π' || x == 'Rnd' || x == 'Ans' || precedence(x) == 4 || DigitChecking(x))   special = 1;
+
             if(stringOnscreen == ""){
                 expression = [];
                 if(precedence(x) == 2 || x == 'E' || x == '!' || x == '%' || x == '.'){
@@ -111,7 +114,9 @@
             }
             else {
                 if(precedence(x) == 2 && precedence(stringOnscreen[stringOnscreen.length - 1]) == 2) return;
-                if((x == '!' || x == '%' || x == 'E' || x == '.') && !DigitChecking(stringOnscreen[stringOnscreen.length - 1]))
+                if((x == 'E' || x == '.') && !DigitChecking(stringOnscreen[stringOnscreen.length - 1]))
+                    return;
+                if((x == '!' || x == '%') && (stringOnscreen[stringOnscreen.length - 1] == '(' || precedence(stringOnscreen[stringOnscreen.length - 1]) == 1 || precedence(stringOnscreen[stringOnscreen.length - 1]) == 2 || stringOnscreen[stringOnscreen.length - 1] == '^'))
                     return;
             }
 
@@ -146,9 +151,6 @@
 
             if(haveDot && !DigitChecking(x)) haveDot = 0;
 
-            let special = 0;
-            if(x == '(' || x == 'e' || x == 'e^' || x == '10^' || x == 'π' || x == 'Rnd' || x == 'Ans' || precedence(x) == 4 || DigitChecking(x))   special = 1;
-
             if(stringOnscreen.length > 0){
                 if(stringOnscreen[stringOnscreen.length - 1] == ')' && special == 1){
                     if(DigitChecking(x) || x == 'Rnd') stringOnscreen = stringOnscreen + "*";
@@ -180,14 +182,8 @@
             }
 
             switch(x){
-                case 'π':
-                    expression.push(Math.PI);
-                    break;
-                case 'e':
-                    expression.push(Math.E);
-                    break;
                 case 'e^':
-                    expression.push(Math.E);
+                    expression.push("e");
                     expression.push("^");
                     break;
                 case '10^':
@@ -202,7 +198,7 @@
                 case '^(1/':
                     expression.push("^");
                     expression.push("(");
-                    expression.push(1);
+                    expression.push("1");
                     expression.push("/");
                     break;
                 case 'Rnd':
@@ -232,7 +228,7 @@
             document.getElementById('PreAns').innerHTML = "Ans =" + previousAns;
             document.getElementById('Answer').innerHTML = stringOnscreen;
             if(isChange == 1){
-                changeButton()
+                changeButton();
             }
         }
 
@@ -247,6 +243,9 @@
             let strsize = stringOnscreen.length;
             let needDel = expression.pop();
             let checkLast = expression[expression.length - 1];
+            if(needDel == '.')  haveDot = 0;
+            if(needDel == '(')  --numBracket;
+            if(needDel == ')')  ++numBracket;
             if(needDel == '(' && (checkLast == 'sin' || checkLast == 'cos' || checkLast == 'tan' || checkLast == 'log' || checkLast == 'ln' || checkLast == 'asin' || checkLast == 'acos' || checkLast == 'atan' || checkLast == '√')){
                 needDel = needDel + checkLast;
                 expression.pop();
@@ -294,7 +293,18 @@
                     a.push(number);
                     continue;
                 }
-                if(arr[i] == 'Ans') a.push(previousAns);
+                if(arr[i] == 'π'){
+                    a.push(Math.PI);
+                    continue;
+                }
+                if(arr[i] == 'e'){
+                    a.push(Math.E);
+                    continue;
+                }
+                if(arr[i] == 'Ans'){
+                    a.push(previousAns);
+                    continue;
+                }
                 else                a.push(arr[i]);
             }
             Postfix(a);
@@ -349,8 +359,9 @@
         }
 
         function roundeps(x) {
-            if(-1e-11 <= Math.abs(x - Math.round(x)) && Math.abs(x - Math.round(x)) <= 1e-11)
-                return Math.round(x);
+            let y = Math.round(x * 1e10)
+            if(!isNaN(y))
+                return y / 1e10;
             return x;
         }
 
