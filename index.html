@@ -102,9 +102,6 @@
                 isAC = 0;
             }
 
-            let special = 0;
-            if(x == '(' || x == 'e' || x == 'e^' || x == '10^' || x == 'π' || x == 'Rnd' || x == 'Ans' || precedence(x) == 4 || DigitChecking(x))   special = 1;
-
             if(stringOnscreen == ""){
                 expression = [];
                 if((precedence(x) > 0 && precedence(x) < 4) || x == 'E' || x == '!' || x == '%' || x == '.'){
@@ -119,7 +116,9 @@
                 }
             }
             else {
-                if(precedence(x) == 2 && precedence(stringOnscreen[stringOnscreen.length - 1]) == 2) return;
+                if(precedence(x) == 1 && precedence(stringOnscreen[stringOnscreen.length - 1]) == 1)
+                    return;
+                if(precedence(x) == 2 && precedence(stringOnscreen[stringOnscreen.length - 1]) >= 1 && precedence(stringOnscreen[stringOnscreen.length - 1]) <= 2) return;
                 if((x == 'E' || x == '.') && !DigitChecking(stringOnscreen[stringOnscreen.length - 1]))
                     return;
                 if((x == '!' || x == '%') && (stringOnscreen[stringOnscreen.length - 1] == '(' || precedence(stringOnscreen[stringOnscreen.length - 1]) == 1 || precedence(stringOnscreen[stringOnscreen.length - 1]) == 2 || stringOnscreen[stringOnscreen.length - 1] == '^'))
@@ -127,9 +126,7 @@
             }
 
             if(precedence(x) == 1) {
-                if(stringOnscreen.length > 0 && precedence(stringOnscreen[stringOnscreen.length - 1]) > 0 && precedence(stringOnscreen[stringOnscreen.length - 1]) <= 2) 
-                    return;
-                if(stringOnscreen.length == 0 || (stringOnscreen[stringOnscreen.length - 1] != ')' && stringOnscreen[stringOnscreen.length - 1] != 's' && !DigitChecking(stringOnscreen[stringOnscreen.length - 1]))){
+                if(stringOnscreen[stringOnscreen.length - 1] != ')' && stringOnscreen[stringOnscreen.length - 1] != 's' && !DigitChecking(stringOnscreen[stringOnscreen.length - 1])){
                     if(x == '+')    x = '0+';
                     else            x = '0-';
                 }
@@ -154,6 +151,9 @@
                 if(x == '√')    x = '^2';
                 if(x == '^')    x = '^(1/';
             }
+
+            let special = 0;
+            if(x == '(' || x == 'e' || x == 'e^' || x == '10^' || x == 'π' || x == 'Rnd' || x == 'Ans' || precedence(x) == 4 || DigitChecking(x))   special = 1;
 
             if(haveDot && !DigitChecking(x)) haveDot = 0;
 
