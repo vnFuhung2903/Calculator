@@ -111,7 +111,9 @@
                     }
                     else{
                         stringOnscreen = stringOnscreen + previousAns;
-                        expression.push(previousAns.toString());
+                        let preinput = previousAns.toString();
+                        for(let i = 0; i < preinput.length; ++i)
+                            expression.push(preinput[i]);
                     }
                 }
             }
@@ -367,16 +369,16 @@
         }
 
         function roundeps(x) {
-            let y = Math.round(x * 1e10)
+            let y = Math.round(x * 1e12)
             if(!isNaN(y))
-                return y / 1e10;
+                return y / 1e12;
             return x;
         }
 
         function Result1(x, ope) {
             if(ope == "0+") return x;
             if(ope == "0-") return -x;
-            if(ope == "%")  return x / 100;
+            if(ope == "%")  return roundeps(x / 100);
             if(ope == "sin") return roundeps(Math.sin((1 - isRad) * x * Math.PI / 180 + isRad * x));
             if(ope == "cos") return roundeps(Math.cos((1 - isRad) * x * Math.PI / 180 + isRad * x));
             if(ope == "tan") return roundeps(roundeps(Math.sin((1 - isRad) * x * Math.PI / 180 + isRad * x)) / roundeps(Math.cos((1 - isRad) * x * Math.PI / 180 + isRad * x)));
@@ -392,9 +394,9 @@
                 if(isRad == 1)  return roundeps(Math.atan(x)); 
                 else            return roundeps(Math.atan(x) / Math.PI * 180);
             }
-            if(ope == "log") return Math.log10(x);
-            if(ope == "ln") return Math.log(x);
-            if(ope == "√") return Math.sqrt(x);
+            if(ope == "log") return roundeps(Math.log10(x));
+            if(ope == "ln") return roundeps(Math.log(x));
+            if(ope == "√") return roundeps(Math.sqrt(x));
             if(ope == "!") return Factorial(x);
         }
 
@@ -408,9 +410,9 @@
         function Result2(x, y, ope){
             if(ope == "+") return x + y;
             if(ope == "-") return x - y;
-            if(ope == "*") return x * y;
+            if(ope == "*") return roundeps(x * y);
             if(ope == "/") return x / y;
-            if(ope == "^") return Math.pow(x, y);
+            if(ope == "^") return roundeps(Math.pow(x, y));
             if(ope == 'E') return x * Math.pow(10, y);
         }
 
@@ -453,4 +455,3 @@
         
 </body>
 </html>
-
